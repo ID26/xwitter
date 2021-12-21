@@ -1,5 +1,6 @@
 package ru.denisov26.xwitter.services;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +19,9 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final EmailService emailService;
     private final PasswordEncoder passwordEncoder;
+
+    @Value("${hostname}")
+    private String hostname;
 
     public UserService(UserRepository userRepository, EmailService emailService, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
@@ -56,8 +60,9 @@ public class UserService implements UserDetailsService {
         if (!StringUtils.isEmpty(user.getEmail())) {
             String message = String.format(
                     "Hello, %s. Welcome to Xwitter. " +
-                            "Please, visit next link: http://localhost:8080/activate/%s",
+                            "Please, visit next link: http://%s/activate/%s",
                     user.getUsername(),
+                    hostname,
                     user.getActivationCode());
             emailService.send(user.getEmail(), "Activation code", message);
         }
